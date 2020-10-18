@@ -1,0 +1,35 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+#Carregando pacotes
+```{r}
+#instalação do pacote "readr"
+install.packages("readr")
+
+library(readr)
+
+```
+
+
+#Importando a base de dados
+```{r}
+library(readr)
+aluguel <- read_delim("C:/Users/dnl49/OneDrive/Curso R 2/aluguel.csv", 
+    ";", escape_double = FALSE, trim_ws = TRUE)
+View(aluguel)
+```
+
+
+#Entendendo a base de dados
+```{r}
+str(aluguel)
+
+```
+
+```{r}
+head(aluguel)
+```
+
