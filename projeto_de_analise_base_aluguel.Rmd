@@ -94,3 +94,75 @@ Leblon
 casas_f2 = filter(casas_f1, Bairro %in% c("Barra da Tijuca", "Leblon"))
 glimpse(casas_f2)
 ```
+Ordenar a base de dados
+```{r}
+library(tidyverse)
+
+arrange(casas_f2)
+```
+
+
+Ordenação decrescente
+```{r}
+arrange(casas_f2, desc(Valor))
+```
+
+
+Criando novos campos na base de dados (mutate)
+```{r}
+casas_f2 = mutate(casas_f2, Indicador = (Area/Valor)*100)
+casas_f2
+```
+
+
+```{r}
+casas_finais = mutate(casas_f2, Visitas = ifelse(Indicador > 5, "OK", "NOK"))
+casas_finais
+```
+
+```{r}
+filter(casas_finais, Visitas == "OK")
+```
+
+Combinar o comando filter com o select
+```{r}
+select(filter(casas_finais, Visitas == "OK"), Area, Valor, Indicador, Visitas)
+```
+
+Pacotes
+```{r}
+library(tidyverse)
+
+install.packages("magrittr")
+library(magrittr)
+```
+
+Utilização do Pipe %>% Ctrl+Shift+M
+
+#Sem a utilização do Pipe
+```{r}
+filter(aluguel_t, Tipo == 'Casa')
+```
+
+#Com a utilização do Pipe %>%
+```{r}
+aluguel_t %>%
+  filter(Tipo == "Casa")
+```
+
+#Sem a utilização do Pipe %>%
+```{r}
+casas = filter(aluguel_t, Tipo == "Casa")
+casas_f1 = filter(casas, Quartos >= 4, Valor <= 15000)
+casas_f2 = filter(casas_f1, Bairros = c("Barra da Tijuca", "Leblon"))
+casas_f2 = arrange(casas_f2, desc(Valor))
+```
+
+#Utilizando o comando Pipe %>%
+```{r}
+casas_selecionadas = aluguel_t %>%
+  filter(Tipo == "Casa", Quartos >= 4, Valor <= 15000, Bairro %in% c("Barra da Tijuca", "Leblon")) %>%
+  arrange(desc(Valor))
+  
+casas_selecionadas
+```
