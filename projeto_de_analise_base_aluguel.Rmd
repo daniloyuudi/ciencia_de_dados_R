@@ -17,7 +17,7 @@ library(readr)
 #Importando a base de dados
 ```{r}
 library(readr)
-aluguel <- read_delim("C:/Users/dnl49/OneDrive/Curso R 2/aluguel.csv", 
+aluguel <- read_delim("aluguel.csv", 
     ";", escape_double = FALSE, trim_ws = TRUE)
 View(aluguel)
 ```
@@ -154,7 +154,7 @@ aluguel_t %>%
 ```{r}
 casas = filter(aluguel_t, Tipo == "Casa")
 casas_f1 = filter(casas, Quartos >= 4, Valor <= 15000)
-casas_f2 = filter(casas_f1, Bairros = c("Barra da Tijuca", "Leblon"))
+casas_f2 = filter(casas_f1, Bairro %in% c("Barra da Tijuca", "Leblon"))
 casas_f2 = arrange(casas_f2, desc(Valor))
 ```
 
@@ -165,4 +165,218 @@ casas_selecionadas = aluguel_t %>%
   arrange(desc(Valor))
   
 casas_selecionadas
+```
+
+
+Gerando novas informações de forma agrupada e sumarizada
+group_by
+summarize
+
+%>% Ctrl + Shift + M
+
+```{r}
+aluguel_t %>%
+  group_by(Tipo) %>%
+  summarize(qtde = n())
+```
+
+Agrupamento por mais de um campo
+Tipo e o Bairro
+```{r}
+aluguel_t %>%
+  group_by(Tipo, Bairro) %>%
+  summarize(qtde = n())
+  
+```
+
+Utilizando outros comandos no summarize para resumir a base de dados:
+max, min, media, ...
+```{r}
+aluguel_t %>%
+  group_by(Tipo) %>%
+  summarize(qtde = n(), media = mean(Valor), max = max(Valor), min = min(Valor))
+```
+
+
+Um outro comando; summary
+```{r}
+summary(aluguel_t)
+```
+
+
+Fazer a operação de agrupamento sem valores ausentes
+```{r}
+aluguel_t %>% 
+  group_by(Tipo) %>%
+  summarize(qtde = n(), media = mean(Valor, na.rm = T))
+```
+
+Combinando várias sumarizações
+```{r}
+aluguel_t %>% 
+  group_by(Tipo) %>% 
+  summarize(valorMedio = mean(Valor, na.rm = T),
+            valorMinimo = min(Valor, na.rm = T),
+            valorMaximo = max(Valor, na.rm = T),
+            total = n())
+```
+
+#Relacionamento entre diferentes tabelas (data frames)
+
+carregar o pacote tidyverse
+```{r}
+library(tidyr)
+```
+
+#criando as tabelas Cargo e Local
+```{r}
+#primeira tabela
+Cargo = data.frame(c("Andre", "Marcos", "Fernanda", "Julia"), c("Analista", "Analista", "Coordenador", "Gerente"))
+colnames(Cargo) = c("nome", "cargo")
+
+Cargo
+```
+
+```{r}
+#Segunda tabela: Local
+
+Local = data.frame(c("Fabio", "Marcos", "Fernanda", "Julia"), c("Comercial", "CRM", "TI", "RH"))
+
+colnames(Local) = c("nome", "local")
+
+Local
+```
+
+#left join
+```{r}
+
+Cargo %>% 
+  left_join(Local, by = "nome")
+```
+
+
+#right join
+```{r}
+Cargo %>% 
+  right_join(Local, by = "nome")
+```
+
+#inner join
+```{r}
+Cargo %>% 
+  inner_join(Local, by = "nome")
+```
+
+#full join
+```{r}
+Cargo %>% 
+  full_join(Local, by = "nome")
+```
+
+#anti join pela primeira tabela: Cargo
+```{r}
+Cargo %>% 
+  anti_join(Local, by = "nome")
+```
+
+#anti join pela segunda tabela: Local
+```{r}
+Local %>% 
+  anti_join(Cargo, by = "nome")
+```
+
+```{r}
+library(tidyverse)
+```
+
+
+
+#Importando a base de dados
+```{r}
+library(readxl)
+funcionarios <- read_excel("funcionarios.xlsx")
+View(funcionarios)
+```
+#Estrutura da base de dados
+```{r}
+str(funcionarios)
+```
+
+#Ajustar alguns campos da base
+```{r}
+func_t <- funcionarios %>% 
+  mutate(
+    civil = factor(civil, labels = c("solteiro", "casado"), levels = 1:2),
+    instrucao = factor(instrucao, labels = c("1º grau", "2º grau", "superior"), levels = 1:3),
+    regiao = factor(regiao, labels = c("capital", "interior", "outros"), levels = c(2,1,3)) )
+    
+str(func_t)
+```
+
+```{r}
+head(func_t)
+```
+
+
+#Entendendo as variáveis
+
+#observar frequencias absolutas e relativas
+```{r}
+freq_absoluta = table(func_t$civil)
+freq_absoluta
+```
+
+```{r}
+freq_relativa = prop.table(freq_absoluta) * 100
+freq_relativa
+```
+
+```{r}
+t(rbind(freq_absoluta, freq_relativa))
+```
+
+#região
+```{r}
+freq_absoluta = table(func_t$regiao)
+freq_absoluta
+```
+
+```{r}
+freq_relativa = prop.table(freq_absoluta) * 100
+freq_relativa
+```
+
+```{r}
+t(rbind(freq_absoluta, freq_relativa))
+```
+
+#Visualizacao gráfica
+
+Gráfico de barras
+```{r}
+bp = barplot(table(func_t$civil), col = c("blue", "red"))
+```
+
+Gráfico de pizza
+```{r}
+freq_absoluta = table(func_t$civil)
+freq_relativa = prop.table(freq_absoluta) * 100
+rotulos <- c("solteiro", "casado")
+rotulos <- paste(rotulos, freq_relativa)
+rotulos <- paste(rotulos, "%", sep = " ")
+pie(freq_relativa, labels = rotulos, col = c("blue", "red"))
+```
+
+Juntando os gráficos
+```{r}
+par(mfrow = c(1,2))
+
+bp = barplot(table(func_t$civil), col = c("blue", "red"))
+
+freq_absoluta = table(func_t$civil)
+freq_relativa = prop.table(freq_absoluta) * 100
+rotulos <- c("solteiro", "casado")
+rotulos <- paste(rotulos, freq_relativa)
+rotulos <- paste(rotulos, "%", sep = " ")
+pie(freq_relativa, labels = rotulos, col = c("blue", "red"))
 ```
