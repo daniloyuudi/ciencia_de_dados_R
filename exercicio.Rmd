@@ -1,0 +1,21 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+#Carrega a base de dados cars
+```{r}
+datasets::cars
+```
+
+
+#Cria gráficos de distribuição e boxplots
+```{r}
+par(mfrow=c(1,2))
+hist(cars$speed, main="velocidade")
+hist(cars$dist, main="distancia")
+boxplot(cars$speed, main="velocidade")
+boxplot(cars$dist, main="distancia")
+
+```
+
