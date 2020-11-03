@@ -1,6 +1,8 @@
 ---
 title: "R Notebook"
-output: html_notebook
+output:
+  html_notebook: default
+  pdf_document: default
 ---
 
 
@@ -379,4 +381,63 @@ rotulos <- c("solteiro", "casado")
 rotulos <- paste(rotulos, freq_relativa)
 rotulos <- paste(rotulos, "%", sep = " ")
 pie(freq_relativa, labels = rotulos, col = c("blue", "red"))
+```
+```{r}
+library(tidyverse)
+library(magrittr)
+library(dplyr)
+library(ggplot2)
+```
+
+
+#visualização gráfica Boxplot
+
+
+Será que o salário dos funcionários diferem por diferentes graus de instrução?
+```{r}
+boxplot(salario ~ instrucao, func_t)
+```
+
+Salário difere por região?
+```{r}
+boxplot(salario ~ regiao, func_t)
+```
+
+#Existe diferença entre salário x grau de instrução x região?
+```{r}
+ggplot(data=func_t) +
+  geom_boxplot(mapping = aes(x = regiao, y = salario, color = instrucao)) +
+  facet_grid((regiao ~ .))
+```
+
+# Tratamento de outliers / pontos discrepantes
+
+```{r}
+install.packages("pastecs")
+library(pastecs)
+```
+
+
+#visualização gráfica da variável número de filhos
+```{r}
+qplot(func_t$filhos)
+```
+
+```{r}
+stat.desc(func_t$filhos)
+```
+
+```{r}
+boxplot(func_t$filhos)
+```
+
+#Excluir/Filtra a base de dados
+```{r}
+func_t2 = filter(func_t, filhos <= 10)
+
+stat.desc(func_t2$filhos)
+```
+
+```{r}
+boxplot(func_t2$filhos)
 ```
